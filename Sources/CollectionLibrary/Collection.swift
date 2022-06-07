@@ -1,14 +1,24 @@
 //
-//  File.swift
+//  Collection.swift
 //  
 //
-//  Created by lsd on 05/06/22.
+//  Created by Leonardo Dabus on 05/06/22.
 //
 
 import struct Foundation.Decimal
 import Foundation.FoundationLegacySwiftCompatibility
 
 public extension Collection {
+
+    func indexedElements(body: ((index: Index, element: Element)) throws -> Void) rethrows {
+        for element in indexedElements {
+            try body(element)
+        }
+    }
+
+    var indexedElements: Zip2Sequence<Indices, Self> {
+        zip(indices, self)
+    }
 
     func unfoldSubSequences(limitedTo maxLength: Int) -> UnfoldSequence<SubSequence, Index> {
         sequence(state: startIndex) { lowerBound in
@@ -22,7 +32,7 @@ public extension Collection {
         }
     }
 
-    func every(n: Int) -> UnfoldSequence<Element,Index> {
+    func every(n: Int) -> UnfoldSequence<Element, Index> {
         sequence(state: startIndex) { index in
             guard index < endIndex else { return nil }
             defer {
@@ -49,13 +59,13 @@ public extension Collection where Element: BinaryInteger {
     func average() -> Element {
         isEmpty ? .zero : sum() / Element(count)
     }
-    /// Returns the average of all elements in the array as Floating Point type
+    /// Returns the average of all elements in the array
     func average<T: FloatingPoint>() -> T {
         isEmpty ? .zero : T(sum()) / T(count)
     }
 }
 
-public extension Collection where Element: BinaryFloatingPoint {
+public extension Collection where Element: FloatingPoint {
     /// Returns the average of all elements in the array
     func average() -> Element {
         isEmpty ? .zero : sum() / Element(count)
@@ -63,25 +73,27 @@ public extension Collection where Element: BinaryFloatingPoint {
 }
 
 public extension Collection where Element == Decimal {
+    /// Returns the average of all elements in the array
     func average() -> Decimal {
         isEmpty ? .zero : self.reduce(.zero, +) / Decimal(count)
     }
 }
 
-
-
 public extension Collection {
+    /// Returns the average of all elements in the array
     func average<T: BinaryInteger>(_ predicate: (Element) -> T) -> T {
         sum(predicate) / T(count)
     }
-    func average<T: BinaryInteger, F: BinaryFloatingPoint>(_ predicate: (Element) -> T) -> F {
+    /// Returns the average of all elements in the array
+    func average<T: BinaryInteger, F: FloatingPoint>(_ predicate: (Element) -> T) -> F {
         F(sum(predicate)) / F(count)
     }
-    func average<T: BinaryFloatingPoint>(_ predicate: (Element) -> T) -> T {
+    /// Returns the average of all elements in the array
+    func average<T: FloatingPoint>(_ predicate: (Element) -> T) -> T {
         sum(predicate) / T(count)
     }
+
     func average(_ predicate: (Element) -> Decimal) -> Decimal {
         sum(predicate) / Decimal(count)
     }
 }
-

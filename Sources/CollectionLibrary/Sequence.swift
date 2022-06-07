@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  Sequence.swift
 //  
 //
 //  Created by Leonardo Dabus on 05/06/22.
