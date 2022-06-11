@@ -98,7 +98,7 @@ public extension Collection {
     }
 }
 
-extension Collection where Element: Equatable {
+public extension Collection where Element: Equatable {
     
     func firstIndex(after element: Element) -> Index? {
         guard let index = firstIndex(of: element) else { return nil }
