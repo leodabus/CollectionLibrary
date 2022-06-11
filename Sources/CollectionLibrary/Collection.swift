@@ -97,3 +97,68 @@ public extension Collection {
         sum(predicate) / Decimal(count)
     }
 }
+
+extension Collection where Element: Equatable {
+    
+    func firstIndex(after element: Element) -> Index? {
+        guard let index = firstIndex(of: element) else { return nil }
+        return self.index(after: index)
+    }
+    
+    func subSequence(from element: Element) -> SubSequence? {
+        guard let index = firstIndex(of: element) else { return nil }
+        return self[index...]
+    }
+    func subSequence(after element: Element) -> SubSequence? {
+        guard let index = firstIndex(after: element) else { return nil }
+        return self[index...]
+    }
+    
+    func subSequence(upTo element: Element) -> SubSequence? {
+        guard let index = firstIndex(after: element) else { return nil }
+        return self[..<index]
+    }
+    func subSequence(upThrough element: Element) -> SubSequence? {
+        guard let index = firstIndex(of: element) else { return nil }
+        return self[...index]
+    }
+    
+    func subSequence(from element: Element, upTo: Element) -> SubSequence? {
+        guard
+            let lower = firstIndex(of: element),
+            let upper = self[lower...].firstIndex(of: upTo)
+        else { return nil }
+        return self[lower..<upper]
+    }
+    func subSequence(from element: Element, upThrough: Element) -> SubSequence? {
+        guard
+            let lower = firstIndex(of: element),
+            let upper = self[lower...].firstIndex(of: upThrough)
+        else { return nil }
+        return self[lower...upper]
+    }
+    
+    func subSequence(after element: Element, upTo: Element) -> SubSequence? {
+        guard
+            let lower = firstIndex(after: element),
+            let upper = self[lower...].firstIndex(of: upTo)
+        else { return nil }
+        return self[lower..<upper]
+    }
+    func subSequence(after element: Element, upThrough: Element) -> SubSequence? {
+        guard
+            let lower = firstIndex(after: element),
+            let upper = self[lower...].firstIndex(of: upThrough)
+        else { return nil }
+        return self[lower...upper]
+    }
+}
+
+extension Collection {
+    func dropLast(while predicate: (Element) throws -> Bool) rethrows -> SubSequence {
+        guard let index = try indices.reversed().first(where: { try !predicate(self[$0]) }) else {
+            return self[startIndex..<startIndex]
+        }
+        return self[...index]
+    }
+}
