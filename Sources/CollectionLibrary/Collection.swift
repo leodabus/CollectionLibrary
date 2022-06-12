@@ -162,3 +162,35 @@ extension Collection {
         return self[...index]
     }
 }
+
+extension Collection {
+    func splitAndKeep(
+        maxSplits: Int = .max,
+        omittingEmptySubsequences: Bool = true,
+        whereSeparator isSeparator: (Element) throws -> Bool
+    ) rethrows -> [SubSequence] {
+        precondition(maxSplits >= 0, "maxSplits can not be negative")
+        if isEmpty { return [] }
+        var subsequences: [SubSequence] = []
+        var lowerBound = startIndex
+        func appendAndAdvance(with upperBound: Index) {
+            let range = lowerBound..<upperBound
+            if !omittingEmptySubsequences || !range.isEmpty {
+                subsequences.append(self[range])
+                lowerBound = upperBound
+            }
+        }
+        while
+            var upperBound = try self[lowerBound...].firstIndex(where: isSeparator),
+            subsequences.count < maxSplits {
+            appendAndAdvance(with: upperBound)
+            if subsequences.count == maxSplits {
+                break
+            }
+            formIndex(after: &upperBound)
+            appendAndAdvance(with: upperBound)
+        }
+        appendAndAdvance(with: endIndex)
+        return subsequences
+    }
+}
